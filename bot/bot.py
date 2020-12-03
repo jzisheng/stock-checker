@@ -3,13 +3,13 @@ import json
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-DEBUG = True
+DEBUG = False
 
 driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub",
                           DesiredCapabilities.CHROME)
-# driver = webdriver.Chrome('/usr/local/bin/chromedriver')
 
-d = json.load(open('/Users/zisheng/botkeys.json'))
+
+d = json.load(open('/home/zisheng/botkeys.json'))
 DISCO_NJ_CHANNEL = d['DISCO_NJ_CHANNEL']
 DISCO_VA_CHANNEL = d['DISCO_VA_CHANNEL']
 TEST_CHANNEL = d['TEST_CHANNEL']
@@ -54,8 +54,17 @@ def genUrl(url_str,keywords):
 
 if DEBUG == False:
     keywords = ["rtx","3060"]    
-    checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))   
+    checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))
+
+    keywords = ["rtx","3080"]    
+    checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))
+
+    keywords = ["rtx","3060"]    
+    checkStock(DISCO_VA_CHANNEL, genUrl(VA_URL,keywords))
+
+    keywords = ["rtx","3080"]    
+    checkStock(DISCO_VA_CHANNEL, genUrl(VA_URL,keywords))           
 else:
     keywords = ["intel","i7"]    
-    checkStock(TEST_CHANNEL, genUrl(NJ_URL,keywords))
+    checkStock(TEST_CHANNEL, genUrl(VA_URL,keywords))
 driver.quit()
