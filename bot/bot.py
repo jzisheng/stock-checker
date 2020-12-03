@@ -67,4 +67,5 @@ if DEBUG == False:
 else:
     keywords = ["intel","i7"]    
     checkStock(TEST_CHANNEL, genUrl(VA_URL,keywords))
+
 driver.quit()
