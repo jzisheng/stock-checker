@@ -1,7 +1,9 @@
 import requests
+from datetime import datetime
 import json
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 
 DEBUG = False
 
@@ -26,6 +28,10 @@ def checkStock(disco_hook,url):
     driver.get(url)    
     prodNames = driver.find_elements_by_xpath("//*[starts-with(@id, 'hypProductH2')]")
     stockAmt = driver.find_elements_by_xpath("//*[starts-with(@class, 'stock')]")
+    videoCards = driver.find_elements_by_xpath("//*[starts-with(@data-category, 'Video Cards')]")
+    if len(videoCards) == 0:
+        print("[bot]:",len(videoCards),"in stock")
+        return "Out of stock"
     
     stocks = []
     for sn in stockAmt:
@@ -38,34 +44,43 @@ def checkStock(disco_hook,url):
     tot = []
     
     for prod, stockStr in res:
-        if "IN STOCK" in stockStr: #  or DEBUG:
+        if "IN STOCK" in stockStr:
             ss = ["-"*10,prod,"**"+stockStr+"**"]
             tot.append("\n".join(ss))
     if tot:
         tot = tot[:3]
         tot.append("[Microcenter website]({})".format(url))
         msg = ("\n".join(tot))
+        print(msg)
         sendMessage(disco_hook, msg)
+
+    return "In stock"
 
 def genUrl(url_str,keywords):
     return url_str.format("+".join(keywords))
 
 
+def main():
+    if DEBUG == False:
+        keywords = ["rtx","3080"]    
+        checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))
+        checkStock(DISCO_VA_CHANNEL, genUrl(VA_URL,keywords))    
 
-if DEBUG == False:
-    keywords = ["rtx","3060"]    
-    checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))
+        keywords = ["rtx","3060"]
+        checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))    
+        checkStock(DISCO_VA_CHANNEL, genUrl(VA_URL,keywords))    
 
-    keywords = ["rtx","3080"]    
-    checkStock(DISCO_NJ_CHANNEL, genUrl(NJ_URL,keywords))
+    else:
+        keywords = ["gtx","1060"]    
+        checkStock(TEST_CHANNEL, genUrl(NJ_URL,keywords))
 
-    keywords = ["rtx","3060"]    
-    checkStock(DISCO_VA_CHANNEL, genUrl(VA_URL,keywords))
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print(current_time, "Checked Stock")
 
-    keywords = ["rtx","3080"]    
-    checkStock(DISCO_VA_CHANNEL, genUrl(VA_URL,keywords))           
-else:
-    keywords = ["intel","i7"]    
-    checkStock(TEST_CHANNEL, genUrl(VA_URL,keywords))
-
+try:
+    main()
+except:
+    print("[bot]: error occured")
+    sendMessage(TEST_CHANNEL,"[bot]: error occured")
 driver.quit()
